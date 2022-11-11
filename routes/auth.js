@@ -11,27 +11,27 @@ module.exports = (mongoClient)=>{
     const PRITUNL_DB = mongoClient.db("pritunl");
     const AUTH_COLLECTION = PRITUNL_DB.collection('panel_auth');
 
-    // router.post('/register', (req, res) => {
-    //     const newUser = {
-    //         userName: req.body.userName,
-    //         password: req.body.password
-    //     }
-    //     bcrypt.genSalt(10, (err, salt) => {
-    //         if (err) throw err;
-    //         bcrypt.hash(newUser.password, salt,
-    //             (err, hash) => {
-    //                 if (err) throw err;
-    //                 newUser.password = hash;
-    //                 AUTH_COLLECTION.insertOne(newUser, function(err, r) {
-    //                     if (err) {
-    //                         res.status(400).json(err)
-    //                         throw err
-    //                     }
-    //                     res.status(200).json({});
-    //                 });
-    //             });
-    //     });
-    // });
+    router.post('/register', (req, res) => {
+        const newUser = {
+            userName: req.body.userName,
+            password: req.body.password
+        }
+        bcrypt.genSalt(10, (err, salt) => {
+            if (err) throw err;
+            bcrypt.hash(newUser.password, salt,
+                (err, hash) => {
+                    if (err) throw err;
+                    newUser.password = hash;
+                    AUTH_COLLECTION.insertOne(newUser, function(err, r) {
+                        if (err) {
+                            res.status(400).json(err)
+                            throw err
+                        }
+                        res.status(200).json({});
+                    });
+                });
+        });
+    });
 
     router.get('/', (req, res) => {
         res.status(200).json({message:"nothing here"});

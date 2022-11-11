@@ -13,8 +13,8 @@ class ExpireCheck{
 
     
     updateExpireCollection = async () => {
-        let pritnlUsers = await getUsers(this.USERS);
-        let usersExpire = await getUsersExpire(this.USERS_EXPIRE);
+        let pritnlUsers = await this.getUsers(this.USERS);
+        let usersExpire = await this.getUsersExpire(this.USERS_EXPIRE);
 
 
         let deletedPritnlUsers = pritnlUsers.filter(u=>(!u.name||typeof u.name !== 'string'||u.name.trim().length === 0));

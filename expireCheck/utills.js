@@ -39,7 +39,8 @@ class ExpireCheck{
                 creationDate.setMonth(creationDate.getMonth() + 1); // add 1 month to date;
                 arr.push({
                     _id : u._id,
-                    expire_date: creationDate
+                    expire_date: creationDate,
+                    checkEnabled: true
                 });
             }
             return arr;
@@ -130,6 +131,7 @@ class ExpireCheck{
                                 org_id:e.user[0].org_id,
                                 org_name:orgs[e.user[0].org_id.toString()],
                                 expire_date:e.expire_date,
+                                checkEnabled:e.checkEnabled,
                                 creation_date:e.user[0]._id.getTimestamp(),
                             };
                             if(ser){
@@ -147,14 +149,23 @@ class ExpireCheck{
         });
     }
 
+    
+
     checkExpired(){
         this.getUsersJoined().then(usersExpire=>{
             usersExpire.forEach(u => {
-                if(u.expire_date < new Date()){
-                    if(!u.disabled) this.disableUser(u._id);
-                }else{
-                    if(u.disabled) this.disableUser(u._id,false);
+                if((!u.hasOwnProperty("checkEnabled")) || u.checkEnabled === undefined){
+                    this.USERS_EXPIRE.updateOne({ _id: u._id }, {$set: {checkEnabled: true}});
+                    u["checkEnabled"] = true;
                 }
+
+                if(u.checkEnabled){
+                    if(u.expire_date < new Date()){
+                        if(!u.disabled) this.disableUser(u._id);
+                    }else{
+                        if(u.disabled) this.disableUser(u._id,false);
+                    }
+                } 
             });
         })
     }
@@ -169,6 +180,15 @@ class ExpireCheck{
     setExpire(UserId,Date){
         return new Promise((res,rej)=>{
             this.USERS_EXPIRE.updateOne({_id:UserId}, {$set:{expire_date:Date}}, function(err, r) {
+                if (err) rej(err);
+                res();
+            });
+        })
+    }
+
+    setExpireCheckEnabled(UserId,checkEnabled){
+        return new Promise((res,rej)=>{
+            this.USERS_EXPIRE.updateOne({_id:UserId}, {$set:{checkEnabled:checkEnabled}}, function(err, r) {
                 if (err) rej(err);
                 res();
             });
